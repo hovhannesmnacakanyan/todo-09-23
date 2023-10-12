@@ -1,26 +1,61 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { Button, Input } from "./ui-kit";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+interface ITodoItem {
+  text: string;
+  done: boolean;
+  id: number;
 }
 
-export default App;
+export const App = () => {
+  const [todoText, setTodoText] = useState("");
+  const [todoList, setTodoList] = useState<ITodoItem[]>([
+    { id: Date.now(), text: "todo text", done: true },
+  ]);
+
+  const onChange = (value: string) => setTodoText(value);
+  const addTodo = () => {
+    if (todoText.trim()) {
+      setTodoList((prevState) => [
+        ...prevState,
+        { id: Date.now(), text: todoText.trim(), done: false },
+      ]);
+    }
+
+    setTodoText("");
+  };
+
+  const handleCheck = (id: number) => {
+    setTodoList((prevState) =>
+      prevState.map((item) => {
+        if (item.id === id) {
+          return { ...item, done: !item.done };
+        }
+        return item;
+      })
+    );
+  };
+
+  return (
+    <div className="App">
+      <Input value={todoText} label="Add your todo" onChange={onChange} />
+      <Button onClick={addTodo}>Add</Button>
+      <ul>
+        {todoList.map((todoItem) => {
+          return (
+            <li key={todoItem.id}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={todoItem.done}
+                  onChange={() => handleCheck(todoItem.id)}
+                />
+                {todoItem.text}
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
